@@ -8,9 +8,7 @@ namespace DAL
     {
 
         public bool Insert(FileModel model)
-        {
-            FileRecordModel filerecord = new FileRecordModel();
-            filerecord.fileModel.FileName = "";
+        {           
             return true;
         }
     }
