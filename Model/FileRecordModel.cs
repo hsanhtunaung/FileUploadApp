@@ -12,6 +12,8 @@ namespace Model
         public string Currency { get; set; }
         public string Status { get; set; }
         public string TransactionDate { get; set; }
+
+        public string Payment { get; set; }
         public FileModel fileModel { get; set; }
         public FileRecordModel()
         {

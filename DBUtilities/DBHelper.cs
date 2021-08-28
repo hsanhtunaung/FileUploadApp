@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Web.Administration;
 
 namespace DBUtilities
 {
@@ -14,6 +17,15 @@ namespace DBUtilities
         private static string constring;
 
         private List<SqlParameter> args = new List<SqlParameter>();
+
+        public IConfigurationRoot Configuration { get; }
+
+
+        public DBHelper()
+        {           
+          constring= "Server=HSAN;Initial Catalog=FileUploadDB;User Id=sa;Password=123456;";           
+        }
+       
 
         public void AddParaInput(string parametername, object obj, SqlDbType dbtype)
         {
@@ -50,6 +62,45 @@ namespace DBUtilities
             {
                 return -1;
             }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+
+        public DataTable GetTable(string procedure)
+        {
+            SqlConnection con = new SqlConnection(constring);
+            SqlCommand com = new SqlCommand();
+            if (con.State != ConnectionState.Open)
+            {
+                con.Open();
+            }
+            com.CommandText = procedure;
+            com.CommandType = CommandType.StoredProcedure;
+            com.Connection = con;
+            DataTable dt = new DataTable();
+            SqlDataAdapter adp = new SqlDataAdapter();
+            adp.SelectCommand = com;
+
+            try
+            {
+
+                if (this.args.Count() > 0) com.Parameters.AddRange(args.ToArray());
+                adp.Fill(dt);
+                return dt;
+            }
+
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+
             finally
             {
                 if (con.State == ConnectionState.Open)
