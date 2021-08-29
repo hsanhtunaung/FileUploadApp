@@ -1,0 +1,135 @@
+USE [FileUploadDB]
+GO
+/****** Object:  Table [dbo].[Tbl_File]    Script Date: 29/8/2021 4:29:49 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Tbl_File](
+	[FileID] [int] IDENTITY(1,1) NOT NULL,
+	[FileName] [nvarchar](50) NOT NULL,
+	[FileType] [nvarchar](50) NOT NULL,
+	[Date] [datetime] NOT NULL CONSTRAINT [DF_Tbl_File_Date]  DEFAULT (getdate()),
+ CONSTRAINT [PK_Tbl_File] PRIMARY KEY CLUSTERED 
+(
+	[FileID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[Tbl_Records]    Script Date: 29/8/2021 4:29:49 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Tbl_Records](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[TransactionID] [nvarchar](50) NOT NULL,
+	[Amount] [decimal](18, 0) NOT NULL,
+	[Currency] [nvarchar](3) NOT NULL,
+	[TransactionDate] [nvarchar](50) NOT NULL,
+	[Status] [nvarchar](50) NULL,
+	[FileName] [nvarchar](50) NULL,
+ CONSTRAINT [PK_Tbl_Records_1] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET IDENTITY_INSERT [dbo].[Tbl_File] ON 
+
+INSERT [dbo].[Tbl_File] ([FileID], [FileName], [FileType], [Date]) VALUES (1, N'xmlrecords.xml', N'xml', CAST(N'2021-08-29 16:20:13.540' AS DateTime))
+INSERT [dbo].[Tbl_File] ([FileID], [FileName], [FileType], [Date]) VALUES (2, N'csvrecords.csv', N'csv', CAST(N'2021-08-29 16:21:36.277' AS DateTime))
+INSERT [dbo].[Tbl_File] ([FileID], [FileName], [FileType], [Date]) VALUES (4, N'xmlrecords_forInvalid.xml', N'xml', CAST(N'2021-08-29 16:25:53.233' AS DateTime))
+SET IDENTITY_INSERT [dbo].[Tbl_File] OFF
+SET IDENTITY_INSERT [dbo].[Tbl_Records] ON 
+
+INSERT [dbo].[Tbl_Records] ([ID], [TransactionID], [Amount], [Currency], [TransactionDate], [Status], [FileName]) VALUES (1, N'Inv00001', CAST(10000 AS Decimal(18, 0)), N'EUR', N'2019-01-23T13:45:10', N'Done', N'xmlrecords.xml')
+INSERT [dbo].[Tbl_Records] ([ID], [TransactionID], [Amount], [Currency], [TransactionDate], [Status], [FileName]) VALUES (2, N'Inv00002', CAST(10000 AS Decimal(18, 0)), N'EUR', N'2019-01-24T16:09:15', N'Rejected', N'xmlrecords.xml')
+INSERT [dbo].[Tbl_Records] ([ID], [TransactionID], [Amount], [Currency], [TransactionDate], [Status], [FileName]) VALUES (3, N'Invoice0000001', CAST(1000 AS Decimal(18, 0)), N'USD', N' 20/02/2019 12:33:16', N'Approved', N'csvrecords.csv')
+INSERT [dbo].[Tbl_Records] ([ID], [TransactionID], [Amount], [Currency], [TransactionDate], [Status], [FileName]) VALUES (4, N'Invoice0000002', CAST(300 AS Decimal(18, 0)), N'USD', N'21/02/2019 02:04:59', N'Failed', N'csvrecords.csv')
+INSERT [dbo].[Tbl_Records] ([ID], [TransactionID], [Amount], [Currency], [TransactionDate], [Status], [FileName]) VALUES (6, N'Inv00004', CAST(10000 AS Decimal(18, 0)), N'EUR', N'2019-01-24T16:09:15', N'Rejected', N'xmlrecords_forInvalid.xml')
+SET IDENTITY_INSERT [dbo].[Tbl_Records] OFF
+/****** Object:  StoredProcedure [dbo].[SP_GetByCurrency]    Script Date: 29/8/2021 4:29:49 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE procedure [dbo].[SP_GetByCurrency]
+(
+@Currency nvarchar(5)
+)
+as 
+begin
+
+
+select TransactionID,Amount,Currency,
+(Case When Status =' Approved' Then 'A'     
+        When Status =' Failed' Then 'R'  
+		   When Status ='Rejected' Then 'R'  
+        When Status ='Done' Then 'D' 
+		When Status ='Finished' Then 'D'
+		end ) as Status  from  Tbl_Records where Currency=@Currency
+end
+GO
+/****** Object:  StoredProcedure [dbo].[SP_GetByDate]    Script Date: 29/8/2021 4:29:49 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE procedure [dbo].[SP_GetByDate]
+(
+@Date nvarchar(50)
+)
+as 
+begin
+
+
+select TransactionID,Amount,Currency,
+(Case When Status =' Approved' Then 'A'     
+        When Status =' Failed' Then 'R'  
+		   When Status ='Rejected' Then 'R'  
+        When Status ='Done' Then 'D' 
+		When Status ='Finished' Then 'D'
+		end ) as Status  from  Tbl_Records where  CONVERT(varchar(10), CONVERT(date,TransactionDate, 103), 120 )=CONVERT(varchar(10), CONVERT(date,@Date, 103), 120 )
+end
+GO
+/****** Object:  StoredProcedure [dbo].[SP_GetByStatus]    Script Date: 29/8/2021 4:29:49 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE procedure [dbo].[SP_GetByStatus]
+(
+@Status nvarchar(20)
+)
+as 
+begin
+
+
+select TransactionID,Amount,Currency,
+(Case When Status ='Approved' Then 'A'     
+        When Status ='Failed' Then 'R'  
+		   When Status ='Rejected' Then 'R'  
+        When Status ='Done' Then 'D' 
+		When Status ='Finished' Then 'D'
+		end ) as Status  from  Tbl_Records where Status=@Status
+end
+GO
+/****** Object:  StoredProcedure [dbo].[SP_Insert]    Script Date: 29/8/2021 4:29:49 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE procedure [dbo].[SP_Insert]
+(
+@FileName nvarchar(50),
+@FileType nvarchar(50)
+
+)
+as 
+begin
+insert into Tbl_File(FileName,FileType)values(@FileName,@FileType)
+end
+GO
