@@ -1,4 +1,4 @@
-USE [FileUploadDB]
+CREATE DATABASE [FileUploadDB]
 GO
 /****** Object:  Table [dbo].[Tbl_File]    Script Date: 29/8/2021 4:29:49 pm ******/
 SET ANSI_NULLS ON
