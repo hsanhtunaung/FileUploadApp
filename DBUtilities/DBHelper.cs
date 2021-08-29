@@ -9,25 +9,26 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Web.Administration;
+using Model;
 
 namespace DBUtilities
 {
     public class DBHelper
     {
-        private static string constring;
-
+        #region
+        public static string constring;
         private List<SqlParameter> args = new List<SqlParameter>();
-
-        public IConfigurationRoot Configuration { get; }
+        private IConfiguration _configuration;
+        #endregion
 
 
         public DBHelper()
-        {           
-          constring= "Server=HSAN;Initial Catalog=FileUploadDB;User Id=sa;Password=123456;";           
+        {
+            constring = AppSettings.DbConnection;           
+           
         }
-       
-
-        public void AddParaInput(string parametername, object obj, SqlDbType dbtype)
+               
+       public void AddParaInput(string parametername, object obj, SqlDbType dbtype)
         {
             SqlParameter arg = new SqlParameter();
             arg.ParameterName = parametername;
@@ -38,7 +39,8 @@ namespace DBUtilities
         }
 
         public int Exec(string procedure)
-        {
+        {           
+           
             SqlConnection con = new SqlConnection(constring);
             SqlCommand com = new SqlCommand();
 

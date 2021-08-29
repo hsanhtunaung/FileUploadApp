@@ -11,12 +11,21 @@ namespace DAL
 {
     public class FileDAL : IFile
     {
+
         DBHelper db = new DBUtilities.DBHelper();
-        string constring = "Server=HSAN;Initial Catalog = FileUploadDB; User Id = sa; Password=123456;";
+        public static string connectionstring;
+
+        public FileDAL()
+        {
+
+            connectionstring = AppSettings.DbConnection;
+        }
+        
+    
         public bool Insert(FileModel model)
         {
             try
-            {
+            {               
                 db = new DBUtilities.DBHelper();
                 db.AddParaInput("@FileName", model.FileName, SqlDbType.NVarChar);
                 db.AddParaInput("@FileType", model.FileType, SqlDbType.NVarChar);
@@ -37,7 +46,7 @@ namespace DAL
 
         public bool InsertRecords(DataTable dt)
         {
-            SqlConnection con = new SqlConnection(constring);
+            SqlConnection con = new SqlConnection(connectionstring);
             try
             {
 
@@ -73,24 +82,7 @@ namespace DAL
             }
         }
 
-
-        public List<APIModel> GetALL()
-        {
-            List<APIModel> lst = new List<APIModel>();
-            db = new DBUtilities.DBHelper();
-            DataTable dt = new DataTable();
-
-            dt = db.GetTable("SP_GetALL");
-            foreach (DataRow dr in dt.Rows)
-            {
-                APIModel model = new APIModel();
-                model.id = dr["TransactionID"].ToString();
-                model.payment = dr["Amount"].ToString() + dr["Currency"].ToString();
-                model.Status = dr["Status"].ToString();
-                lst.Add(model);
-            }
-            return lst;
-        }
+               
 
         public List<APIModel> GetByCurrnecy(string currency)
         {
@@ -98,7 +90,7 @@ namespace DAL
             db = new DBUtilities.DBHelper();
             DataTable dt = new DataTable();
             db.AddParaInput("@Currency", currency, SqlDbType.NVarChar);
-            dt = db.GetTable("SP_GetALL");
+            dt = db.GetTable("[SP_GetByCurrency]");
             foreach (DataRow dr in dt.Rows)
             {
                 APIModel model = new APIModel();
@@ -117,7 +109,7 @@ namespace DAL
             db = new DBUtilities.DBHelper();
             DataTable dt = new DataTable();
             db.AddParaInput("@Status", status, SqlDbType.NVarChar);
-            dt = db.GetTable("SP_GetALL");
+            dt = db.GetTable("[SP_GetByStatus]");
             foreach (DataRow dr in dt.Rows)
             {
                 APIModel model = new APIModel();
@@ -129,13 +121,14 @@ namespace DAL
             return lst;
         }
 
+
         public List<APIModel> GetBydate(string date)
         {
             List<APIModel> lst = new List<APIModel>();
             db = new DBUtilities.DBHelper();
             DataTable dt = new DataTable();
             db.AddParaInput("@Date", date, SqlDbType.NVarChar);
-            dt = db.GetTable("SP_GetALL");
+            dt = db.GetTable("SP_GetByDate");
             foreach (DataRow dr in dt.Rows)
             {
                 APIModel model = new APIModel();

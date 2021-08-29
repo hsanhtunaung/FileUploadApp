@@ -7,6 +7,6 @@ namespace Model
         public string ID { get; set; }
         public string FileName { get; set; }
         public string FileType { get; set; }
-        public string Status{ get; set; }
+        public string Date{ get; set; }
     }
 }

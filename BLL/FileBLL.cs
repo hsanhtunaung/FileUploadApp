@@ -10,11 +10,11 @@ namespace BLL
     public class FileBLL
     {
         IFile ifile = new FileDAL();
+
         public bool Insert(FileModel model)
         {
             return ifile.Insert(model);
         }
-
 
 
         public bool InsertRecords(DataTable dt)
@@ -22,13 +22,7 @@ namespace BLL
             return ifile.InsertRecords(dt);
         }
 
-
-        public List<APIModel> GetALL()
-        {
-            return ifile.GetALL();
-        }
-
-
+       
         public List<APIModel> GetByCurrnecy(string currency)
         {
             return ifile.GetByCurrnecy(currency);

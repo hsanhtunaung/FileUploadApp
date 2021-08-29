@@ -9,10 +9,7 @@ namespace IDAL
     {
         bool Insert(FileModel model);
 
-        bool InsertRecords(DataTable dt);
-
-
-        List<APIModel> GetALL();
+        bool InsertRecords(DataTable dt);       
 
         List<APIModel> GetByCurrnecy(string currency);
 
